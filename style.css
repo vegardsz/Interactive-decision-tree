@@ -319,10 +319,10 @@ body {
 }
 .tc-cc-title { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; }
 .tc-cost-table { border-collapse: collapse; width: 100%; }
-.tc-cc-head { font-size: 10px; font-weight: 700; color: #bbb; text-align: right; padding-bottom: 4px; }
-.tc-cc-head:first-child { text-align: left; color: transparent; }
+.tc-cc-head { font-size: 10px; font-weight: 700; color: #bbb; text-align: right; padding: 0 0 4px 14px; width: 80px; }
+.tc-cc-head:first-child { text-align: left; color: transparent; width: auto; }
 .tc-cc-cat { font-size: 11px; color: #555; padding: 3px 0; vertical-align: middle; }
-.tc-cc-val { font-size: 11px; font-weight: 600; color: #111; text-align: right; padding: 3px 0 3px 14px; white-space: nowrap; vertical-align: middle; }
+.tc-cc-val { font-size: 11px; font-weight: 600; color: #111; text-align: right; padding: 3px 0 3px 14px; white-space: nowrap; vertical-align: middle; width: 80px; }
 .tc-cc-unit { font-weight: 400; color: #aaa; font-size: 10px; }
 .tc-cc-bruker { color: #dc2626; }
 .tc-cc-zero { color: #ccc; font-weight: 400; }
