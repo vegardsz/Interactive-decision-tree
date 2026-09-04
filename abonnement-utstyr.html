@@ -17,7 +17,6 @@
     <div class="view-tabs">
       <button class="view-tab"        id="tab-testbruker" onclick="setView('testbruker')">🧪 Testbruker</button>
       <button class="view-tab"        id="tab-wizard"      onclick="setView('wizard')">🧭 Veiviser</button>
-      <button class="view-tab"        id="tab-usecases"   onclick="setView('usecases')">⚡ Use cases</button>
     </div>
   </div>
   <div class="topbar-right">
@@ -37,6 +36,27 @@
         <h2>Testbruker-konfigurasjon</h2>
         <p>Juster innstillinger — grafen oppdateres live</p>
       </div>
+
+      <!-- ── Use case presets ── -->
+      <div class="tc-group">
+        <div class="tc-section">
+          <div class="tc-stitle">⚡ Use case preset</div>
+          <select class="tc-input" id="tc-uc-preset" onchange="applyUseCasePreset(this.value)">
+            <option value="">– Velg preset –</option>
+            <option value="nyansatt-standard">Nyansatt – standard</option>
+            <option value="nyansatt-premium">Nyansatt – premium mobil</option>
+            <option value="kun-abo">Kun nytt abonnement</option>
+            <option value="kun-mobil">Kun ny mobil</option>
+            <option value="byod">BYOD</option>
+            <option value="moterom">Møteromstelefon</option>
+            <option value="bytte-utstyr">Bytte utstyr</option>
+            <option value="ingen-hardware">Ingen hardware</option>
+          </select>
+          <p id="tc-uc-desc" style="font-size:11px;color:#888;margin:4px 0 0;min-height:14px"></p>
+        </div>
+      </div>
+
+      <div class="tc-group-gap"></div>
 
       <!-- ── Gruppe 1: Tilordning ── -->
       <div class="tc-group">
@@ -79,14 +99,14 @@
             <option value="ledelse">Ledelse</option>
           </select>
           <label class="tc-label" style="margin-top:8px">Navn</label>
-          <input class="tc-input" type="text" value="IT-avdelingen"
+          <input class="tc-input" id="tc-avdeling-navn" type="text" value="IT-avdelingen"
             oninput="testState.avdeling.navn=this.value;renderTestGraph()">
           <label class="tc-label">Kostnadssenter</label>
-          <input class="tc-input" type="text" value="KS-1234"
+          <input class="tc-input" id="tc-avdeling-ks" type="text" value="KS-1234"
             oninput="testState.avdeling.kostnadssenter=this.value;renderTestGraph()">
         </div>
 
-        <div class="tc-section tc-subsection">
+        <div class="tc-section tc-subsection" id="tc-policy-section">
           <div class="tc-stitle">🔐 Policy</div>
 
           <div class="tc-toggle-row" style="margin-bottom:8px">
@@ -162,13 +182,13 @@
           <div class="tc-toggle-row">
             <span class="tc-tlabel">Aktiv</span>
             <label class="tc-toggle">
-              <input type="checkbox" onchange="testState.enhet.aktiv=this.checked;renderTestGraph()">
+              <input type="checkbox" id="tc-enhet-aktiv" onchange="testState.enhet.aktiv=this.checked;renderTestGraph()">
               <span class="tc-track"></span>
             </label>
           </div>
           <label class="tc-label">Pris</label>
           <div class="tc-numrow">
-            <input class="tc-input" type="number" value="14990" min="0" step="500"
+            <input class="tc-input" id="tc-enhet-pris" type="number" value="14990" min="0" step="500"
               oninput="testState.enhet.pris=+this.value;renderTestGraph()">
             <span class="tc-unit">kr</span>
           </div>
@@ -203,16 +223,16 @@
           <div class="tc-toggle-row">
             <span class="tc-tlabel">Aktiv</span>
             <label class="tc-toggle">
-              <input type="checkbox" onchange="testState.abonnement.aktiv=this.checked;renderTestGraph()">
+              <input type="checkbox" id="tc-abo-aktiv" onchange="testState.abonnement.aktiv=this.checked;renderTestGraph()">
               <span class="tc-track"></span>
             </label>
           </div>
           <label class="tc-label">Plan</label>
-          <input class="tc-input" type="text" value="Business L"
+          <input class="tc-input" id="tc-abo-plan" type="text" value="Business L"
             oninput="testState.abonnement.plan=this.value;renderTestGraph()">
           <label class="tc-label">Månedlig pris</label>
           <div class="tc-numrow">
-            <input class="tc-input" type="number" value="449" min="0" step="50"
+            <input class="tc-input" id="tc-abo-pris" type="number" value="449" min="0" step="50"
               oninput="testState.abonnement.pris=+this.value;renderTestGraph()">
             <span class="tc-unit">kr/mnd</span>
           </div>

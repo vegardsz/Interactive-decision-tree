@@ -462,3 +462,103 @@ const EDGE_META = {
   'abo-mellomlegg':            { color: '#f87171', w: 2,   dash: null,  label: 'utløser'    },
   'mellomlegg-betalingsmetode':{ color: '#fbbf24', w: 2,   dash: null,  label: 'betales via'}
 };
+
+// ── Use case presets ──────────────────────────────────────────────────────
+const UC_PRESETS = [
+  {
+    id: 'nyansatt-standard',
+    label: 'Nyansatt – standard',
+    description: 'Bedrift dekker alt utstyr og abo – kostnadssenter',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: true,  pris: 10990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business M', pris: 299, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'nyansatt-premium',
+    label: 'Nyansatt – premium mobil',
+    description: 'Enhet over policy – ansatt betaler mellomlegg via lønnstrekk',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: true, enhetAktiv: true, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: true,  pris: 14990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business L', pris: 449, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'kun-abo',
+    label: 'Kun nytt abonnement',
+    description: 'Eksisterende enhet beholdes – bedrift dekker abo',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: false, pris: 10990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business M', pris: 299, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'kun-mobil',
+    label: 'Kun ny mobil',
+    description: 'Eksisterende abo – ny enhet innenfor policy, bedrift dekker',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: true, enhetAktiv: true, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: true,  pris: 10990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: false, plan: 'Business M', pris: 299, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'byod',
+    label: 'BYOD',
+    description: 'Privat enhet – bedrift gir nytt abonnement, dekker abo',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: false, pris: 10990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business M', pris: 299, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'moterom',
+    label: 'Møteromstelefon',
+    description: 'Upersonlig tilordning – bedrift dekker alt, faktureres kostnadssenter',
+    tilordning:  { type: 'kontekstuell', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: true,  pris: 8990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business S', pris: 199, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'bytte-utstyr',
+    label: 'Bytte utstyr',
+    description: 'Beholder abo – ny enhet over policy, ansatt betaler mellomlegg',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: true, enhetAktiv: true, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: true,  pris: 14990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: false, plan: 'Business L', pris: 449, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  },
+  {
+    id: 'ingen-hardware',
+    label: 'Ingen hardware',
+    description: 'Kun abonnement – ingen enhet tilknyttes',
+    tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
+    bruker:      { navn: 'Ola Nordmann' },
+    policy:      { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' },
+    enhet:       { aktiv: false, pris: 10990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
+    abonnement:  { aktiv: true,  plan: 'Business M', pris: 299, simType: 'eSIM' },
+    fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
+    betaling:    { frekvens: 'månedlig', kjøpMåneder: 1 }
+  }
+];

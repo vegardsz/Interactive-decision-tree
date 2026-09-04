@@ -12,21 +12,23 @@ let avdelingStates = makeAvdelingStates();
 let currentAvdeling = 'it';
 
 function syncAvdelingDOM() {
-  const sections = document.querySelectorAll('.test-config-panel .tc-section');
+  const navnEl = document.getElementById('tc-avdeling-navn');
+  const ksEl   = document.getElementById('tc-avdeling-ks');
+  if (navnEl) navnEl.value = testState.avdeling.navn;
+  if (ksEl)   ksEl.value   = testState.avdeling.kostnadssenter;
 
-  const avdInputs = sections[1].querySelectorAll('.tc-input:not(select)');
-  avdInputs[0].value = testState.avdeling.navn;
-  avdInputs[1].value = testState.avdeling.kostnadssenter;
-
-  const policyChecks = sections[2].querySelectorAll('input[type="checkbox"]');
-  policyChecks[0].checked = testState.policy.policyAktiv;
-  policyChecks[1].checked = testState.policy.enhetAktiv;
-  policyChecks[2].checked = testState.policy.aboAktiv;
-  policyChecks[3].checked = testState.policy.enhetUtvalg;
-  const policyNums = sections[2].querySelectorAll('input[type="number"]');
-  policyNums[0].value = testState.policy.enhetMaxPris;
-  policyNums[1].value = testState.policy.aboMaxPris;
-  sections[2].querySelector('textarea').value = testState.policy.enhetUtvalgListe;
+  const policySection = document.getElementById('tc-policy-section');
+  if (!policySection) return;
+  const policyChecks = policySection.querySelectorAll('input[type="checkbox"]');
+  if (policyChecks[0]) policyChecks[0].checked = testState.policy.policyAktiv;
+  if (policyChecks[1]) policyChecks[1].checked = testState.policy.enhetAktiv;
+  if (policyChecks[2]) policyChecks[2].checked = testState.policy.aboAktiv;
+  if (policyChecks[3]) policyChecks[3].checked = testState.policy.enhetUtvalg;
+  const policyNums = policySection.querySelectorAll('input[type="number"]');
+  if (policyNums[0]) policyNums[0].value = testState.policy.enhetMaxPris;
+  if (policyNums[1]) policyNums[1].value = testState.policy.aboMaxPris;
+  const textarea = policySection.querySelector('textarea');
+  if (textarea) textarea.value = testState.policy.enhetUtvalgListe;
   document.getElementById('tc-policy-sub').style.display = testState.policy.policyAktiv ? '' : 'none';
 }
 
@@ -178,4 +180,72 @@ function computeNodeState() {
   }
 
   return { active, edges };
+}
+
+function syncAllDOM() {
+  // Tilordning
+  const tilEl = document.querySelector(`input[name="tilordning"][value="${testState.tilordning.type}"]`);
+  if (tilEl) tilEl.checked = true;
+  const brukerInput = document.querySelector('#tc-bruker-fields .tc-input');
+  if (brukerInput) brukerInput.value = testState.bruker.navn;
+  const kontekstInput = document.querySelector('#tc-kontekst-fields .tc-input');
+  if (kontekstInput) kontekstInput.value = testState.tilordning.kontekstNavn;
+
+  // Avdeling + Policy
+  syncAvdelingDOM();
+
+  // Enhet
+  const enhetAktiv = document.getElementById('tc-enhet-aktiv');
+  if (enhetAktiv) enhetAktiv.checked = testState.enhet.aktiv;
+  const enhetPris = document.getElementById('tc-enhet-pris');
+  if (enhetPris) enhetPris.value = testState.enhet.pris;
+  const kjopsEl = document.querySelector(`input[name="kjopsmodell"][value="${testState.enhet['kjøpsmodell']}"]`);
+  if (kjopsEl) kjopsEl.checked = true;
+  const leasingEl = document.querySelector(`input[name="leasingmnd"][value="${testState.enhet.leasingMåneder}"]`);
+  if (leasingEl) leasingEl.checked = true;
+
+  // Abonnement
+  const aboAktiv = document.getElementById('tc-abo-aktiv');
+  if (aboAktiv) aboAktiv.checked = testState.abonnement.aktiv;
+  const aboPlan = document.getElementById('tc-abo-plan');
+  if (aboPlan) aboPlan.value = testState.abonnement.plan;
+  const aboPris = document.getElementById('tc-abo-pris');
+  if (aboPris) aboPris.value = testState.abonnement.pris;
+  const simEl = document.querySelector(`input[name="simtype"][value="${testState.abonnement.simType}"]`);
+  if (simEl) simEl.checked = true;
+
+  // Betaling
+  const betEl = document.querySelector(`input[name="betfrekvens"][value="${testState.betaling.frekvens}"]`);
+  if (betEl) betEl.checked = true;
+  const kjopMndEl = document.querySelector(`input[name="kjopmaaneder"][value="${testState.betaling.kjøpMåneder}"]`);
+  if (kjopMndEl) kjopMndEl.checked = true;
+
+  // Fakturasted
+  const faktEnhet = document.querySelector(`input[name="fakturasted-enhet"][value="${testState.fakturasted.enhet}"]`);
+  if (faktEnhet) faktEnhet.checked = true;
+  const splitEl = document.getElementById('tc-split-faktura');
+  if (splitEl) splitEl.checked = testState.fakturasted.splitAbo;
+  const faktAbo = document.querySelector(`input[name="fakturasted-abo"][value="${testState.fakturasted.abo}"]`);
+  if (faktAbo) faktAbo.checked = true;
+}
+
+function applyUseCasePreset(id) {
+  if (!id) return;
+  const preset = UC_PRESETS.find(p => p.id === id);
+  if (!preset) return;
+
+  Object.assign(testState.tilordning,  { ...preset.tilordning });
+  Object.assign(testState.bruker,      { ...preset.bruker });
+  Object.assign(testState.policy,      { ...preset.policy });
+  Object.assign(testState.enhet,       { ...preset.enhet });
+  Object.assign(testState.abonnement,  { ...preset.abonnement });
+  Object.assign(testState.fakturasted, { ...preset.fakturasted });
+  Object.assign(testState.betaling,    { ...preset.betaling });
+
+  const descEl = document.getElementById('tc-uc-desc');
+  if (descEl) descEl.textContent = preset.description || '';
+
+  syncAllDOM();
+  drawnEdgesTest.clear();
+  renderTestGraph();
 }

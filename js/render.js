@@ -448,7 +448,7 @@ function renderLog() {
 
   if (!log.length) {
     body.innerHTML = `<div class="log-empty"><div class="log-empty-icon">📋</div><div class="log-empty-text">${
-      currentView==='usecases' ? 'Klikk på en konfigurasjon til venstre' : 'Ta valg til venstre –\nstegene samler seg her'
+      'Ta valg til venstre –\nstegene samler seg her'
     }</div></div>`;
     footer.classList.remove('visible'); return;
   }
@@ -479,7 +479,6 @@ function renderLog() {
 
 function renderAll() {
   renderPhaseTrack();
-  if (currentView === 'wizard')   renderDecision();
-  if (currentView === 'usecases') renderUseCases();
+  if (currentView === 'wizard') renderDecision();
   renderLog();
 }
