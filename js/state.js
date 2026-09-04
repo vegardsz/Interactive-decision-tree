@@ -19,13 +19,15 @@ function syncAvdelingDOM() {
   avdInputs[1].value = testState.avdeling.kostnadssenter;
 
   const policyChecks = sections[2].querySelectorAll('input[type="checkbox"]');
-  policyChecks[0].checked = testState.policy.enhetAktiv;
-  policyChecks[1].checked = testState.policy.aboAktiv;
-  policyChecks[2].checked = testState.policy.enhetUtvalg;
+  policyChecks[0].checked = testState.policy.policyAktiv;
+  policyChecks[1].checked = testState.policy.enhetAktiv;
+  policyChecks[2].checked = testState.policy.aboAktiv;
+  policyChecks[3].checked = testState.policy.enhetUtvalg;
   const policyNums = sections[2].querySelectorAll('input[type="number"]');
   policyNums[0].value = testState.policy.enhetMaxPris;
   policyNums[1].value = testState.policy.aboMaxPris;
   sections[2].querySelector('textarea').value = testState.policy.enhetUtvalgListe;
+  document.getElementById('tc-policy-sub').style.display = testState.policy.policyAktiv ? '' : 'none';
 }
 
 function velgAvdeling(key) {
@@ -47,7 +49,7 @@ const testState = {
   tilordning:  { type: 'personlig', kontekstNavn: 'Møterom A' },
   bruker:      { navn: 'Ola Nordmann' },
   avdeling:    { navn: 'IT-avdelingen', kostnadssenter: 'KS-1234' },
-  policy:      { enhetAktiv: true,  enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: true, enhetUtvalgListe: 'iPhone 16, Samsung S25, Pixel 9' },
+  policy:      { policyAktiv: true, enhetAktiv: true,  enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: true, enhetUtvalgListe: 'iPhone 16, Samsung S25, Pixel 9' },
   enhet:       { aktiv: false, pris: 14990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 },
   abonnement:  { aktiv: false, plan: 'Business L', pris: 449, simType: 'eSIM' },
   fakturasted: { enhet: 'kostnadssenter', abo: 'kostnadssenter', splitAbo: false },
@@ -65,21 +67,22 @@ function computeTestNodeState() {
   const måneder   = testState.enhet.leasingMåneder || 24;
 
   // Mellomlegg is irrelevant for kontekstuell (company pays all)
-  const enhetOver = !isKontekstuell && testState.enhet.aktiv && testState.policy.enhetAktiv
+  const policyOn = !isKontekstuell && testState.policy.policyAktiv;
+  const enhetOver = policyOn && testState.enhet.aktiv && testState.policy.enhetAktiv
     ? Math.max(0, testState.enhet.pris - testState.policy.enhetMaxPris)
     : 0;
   const enhetMellomlegg = isLeasing && enhetOver > 0
     ? Math.round(enhetOver / måneder)
     : enhetOver;
 
-  const aboMellomlegg = !isKontekstuell && testState.abonnement.aktiv && testState.policy.aboAktiv
+  const aboMellomlegg = policyOn && testState.abonnement.aktiv && testState.policy.aboAktiv
     ? Math.max(0, testState.abonnement.pris - testState.policy.aboMaxPris)
     : 0;
 
   const hasMellomlegg  = enhetMellomlegg > 0 || aboMellomlegg > 0;
   const hasEnhetOrAbo  = testState.enhet.aktiv || testState.abonnement.aktiv;
-  const katalogAktiv   = !isKontekstuell && testState.policy.enhetUtvalg && testState.enhet.aktiv;
-  const policyVisible  = !isKontekstuell && (testState.policy.enhetAktiv || testState.policy.aboAktiv || katalogAktiv);
+  const katalogAktiv   = policyOn && testState.policy.enhetUtvalg && testState.enhet.aktiv;
+  const policyVisible  = policyOn && (testState.policy.enhetAktiv || testState.policy.aboAktiv || katalogAktiv);
 
   const split = testState.fakturasted.splitAbo && !isKontekstuell;
   const active = {
@@ -108,7 +111,7 @@ function computeTestNodeState() {
   if (active.enhet) {
     edges.add('user-enhet');
     if (!isKontekstuell) {
-      if (testState.policy.enhetAktiv) edges.add('policy-enhet');
+      if (policyOn && testState.policy.enhetAktiv) edges.add('policy-enhet');
       if (katalogAktiv) {
         edges.add('policy-katalog');
         edges.add('katalog-enhet');
@@ -117,7 +120,7 @@ function computeTestNodeState() {
   }
   if (active.abo) {
     edges.add('user-abo');
-    if (testState.policy.aboAktiv) edges.add('policy-abo');
+    if (policyOn && testState.policy.aboAktiv) edges.add('policy-abo');
     if (active.sim)                edges.add('abo-sim');
   }
   if (enhetMellomlegg > 0) edges.add('enhet-mellomlegg');

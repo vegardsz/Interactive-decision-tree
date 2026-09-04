@@ -89,6 +89,16 @@
         <div class="tc-section tc-subsection">
           <div class="tc-stitle">🔐 Policy</div>
 
+          <div class="tc-toggle-row" style="margin-bottom:8px">
+            <span class="tc-tlabel" style="font-weight:600">Policy aktiv</span>
+            <label class="tc-toggle">
+              <input type="checkbox" id="tc-policy-master" checked
+                onchange="testState.policy.policyAktiv=this.checked;document.getElementById('tc-policy-sub').style.display=this.checked?'':'none';renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+
+          <div id="tc-policy-sub">
           <div class="tc-toggle-row">
             <span class="tc-tlabel">Maks pris – utstyr</span>
             <label class="tc-toggle">
@@ -139,6 +149,7 @@
               oninput="testState.policy.enhetUtvalgListe=this.value;renderTestGraph()"
               >iPhone 16, Samsung S25, Pixel 9</textarea>
           </div>
+          </div><!-- end tc-policy-sub -->
         </div>
       </div>
 

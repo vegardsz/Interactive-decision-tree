@@ -395,13 +395,13 @@ const useCases = [
 // ── Avdeling presets ─────────────────────────────────────────────────────
 const AVDELING_PRESETS = {
   it:      { navn: 'IT-avdelingen', kostnadssenter: 'KS-1234',
-             policy: { enhetAktiv: true,  enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: true,  enhetUtvalgListe: 'iPhone 16, Samsung S25, Pixel 9' } },
+             policy: { policyAktiv: true,  enhetAktiv: true,  enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: true,  enhetUtvalgListe: 'iPhone 16, Samsung S25, Pixel 9' } },
   salg:    { navn: 'Salg',          kostnadssenter: 'KS-5678',
-             policy: { enhetAktiv: true,  enhetMaxPris:  8000, aboAktiv: true,  aboMaxPris: 399, enhetUtvalg: false, enhetUtvalgListe: '' } },
+             policy: { policyAktiv: true,  enhetAktiv: true,  enhetMaxPris:  8000, aboAktiv: true,  aboMaxPris: 399, enhetUtvalg: false, enhetUtvalgListe: '' } },
   hr:      { navn: 'HR',            kostnadssenter: 'KS-9012',
-             policy: { enhetAktiv: true,  enhetMaxPris:  6000, aboAktiv: true,  aboMaxPris: 299, enhetUtvalg: false, enhetUtvalgListe: '' } },
+             policy: { policyAktiv: true,  enhetAktiv: true,  enhetMaxPris:  6000, aboAktiv: true,  aboMaxPris: 299, enhetUtvalg: false, enhetUtvalgListe: '' } },
   ledelse: { navn: 'Ledelse',       kostnadssenter: 'KS-0001',
-             policy: { enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' } },
+             policy: { policyAktiv: false, enhetAktiv: false, enhetMaxPris: 12000, aboAktiv: false, aboMaxPris: 400, enhetUtvalg: false, enhetUtvalgListe: '' } },
 };
 
 const DEFAULT_ENHET      = { aktiv: false, pris: 14990, 'kjøpsmodell': 'kjøp', leasingMåneder: 24 };
