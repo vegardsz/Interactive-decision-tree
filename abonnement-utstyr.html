@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abonnement og utstyr – Decision Tree</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-title">Abonnement og utstyr</span>
+    <span class="topbar-sub">Decision Tree - To be updated as we go!</span>
+  </div>
+  <div class="topbar-center">
+    <div class="view-tabs">
+      <button class="view-tab"        id="tab-testbruker" onclick="setView('testbruker')">🧪 Testbruker</button>
+      <button class="view-tab"        id="tab-wizard"      onclick="setView('wizard')">🧭 Veiviser</button>
+      <button class="view-tab"        id="tab-usecases"   onclick="setView('usecases')">⚡ Use cases</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-reset" onclick="reset()">↺ Start på nytt</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="decision-panel" id="decision-panel"></div>
+  <div class="uc-panel"       id="uc-panel"></div>
+
+  <!-- Testbruker view: large graph + config panel -->
+  <div class="testbruker-panel" id="testbruker-panel">
+    <div class="test-graph-area" id="test-graph-area"></div>
+    <div class="test-config-panel">
+      <div class="tc-header">
+        <h2>Testbruker-konfigurasjon</h2>
+        <p>Juster innstillinger — grafen oppdateres live</p>
+      </div>
+
+      <!-- ── Gruppe 1: Tilordning ── -->
+      <div class="tc-group">
+        <div class="tc-section">
+          <div class="tc-stitle">🔖 Tilordning</div>
+          <div class="tc-radios">
+            <label class="tc-radio">
+              <input type="radio" name="tilordning" value="personlig" checked
+                onchange="testState.tilordning.type=this.value;renderTestGraph()"> Personlig
+            </label>
+            <label class="tc-radio">
+              <input type="radio" name="tilordning" value="kontekstuell"
+                onchange="testState.tilordning.type=this.value;renderTestGraph()"> Kontekstuell
+            </label>
+          </div>
+          <div id="tc-bruker-fields">
+            <label class="tc-label">Navn</label>
+            <input class="tc-input" type="text" value="Ola Nordmann"
+              oninput="testState.bruker.navn=this.value;renderTestGraph()">
+          </div>
+          <div id="tc-kontekst-fields" style="display:none">
+            <label class="tc-label">Kontekstnavn</label>
+            <input class="tc-input" type="text" value="Møterom A"
+              oninput="testState.tilordning.kontekstNavn=this.value;renderTestGraph()">
+          </div>
+        </div>
+      </div>
+
+      <div class="tc-group-gap"></div>
+
+      <!-- ── Gruppe 2: Avdeling + Policy ── -->
+      <div class="tc-group">
+        <div class="tc-section">
+          <div class="tc-stitle">🏢 Avdeling</div>
+          <label class="tc-label">Velg avdeling</label>
+          <select class="tc-input" id="tc-avdeling-preset" onchange="velgAvdeling(this.value)">
+            <option value="it">IT-avdelingen</option>
+            <option value="salg">Salg</option>
+            <option value="hr">HR</option>
+            <option value="ledelse">Ledelse</option>
+          </select>
+          <label class="tc-label" style="margin-top:8px">Navn</label>
+          <input class="tc-input" type="text" value="IT-avdelingen"
+            oninput="testState.avdeling.navn=this.value;renderTestGraph()">
+          <label class="tc-label">Kostnadssenter</label>
+          <input class="tc-input" type="text" value="KS-1234"
+            oninput="testState.avdeling.kostnadssenter=this.value;renderTestGraph()">
+        </div>
+
+        <div class="tc-section tc-subsection">
+          <div class="tc-stitle">🔐 Policy</div>
+
+          <div class="tc-toggle-row">
+            <span class="tc-tlabel">Maks pris – utstyr</span>
+            <label class="tc-toggle">
+              <input type="checkbox" onchange="testState.policy.enhetAktiv=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <div id="tc-policy-enhet-fields">
+            <div class="tc-numrow" style="margin-bottom:4px">
+              <input class="tc-input" type="number" value="12000" min="0" step="500"
+                oninput="testState.policy.enhetMaxPris=+this.value;renderTestGraph()">
+              <span class="tc-unit">kr</span>
+            </div>
+          </div>
+          <div id="tc-policy-enhet-note" style="display:none;margin-bottom:4px">
+            <span style="font-size:11px;color:#888">Bedrift dekker alt – ingen cap</span>
+          </div>
+
+          <div class="tc-toggle-row" style="margin-top:8px">
+            <span class="tc-tlabel">Maks pris – abonnement</span>
+            <label class="tc-toggle">
+              <input type="checkbox" onchange="testState.policy.aboAktiv=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <div id="tc-policy-abo-fields">
+            <div class="tc-numrow">
+              <input class="tc-input" type="number" value="400" min="0" step="50"
+                oninput="testState.policy.aboMaxPris=+this.value;renderTestGraph()">
+              <span class="tc-unit">kr/mnd</span>
+            </div>
+          </div>
+          <div id="tc-policy-abo-note" style="display:none">
+            <span style="font-size:11px;color:#888">Bedrift dekker alt – ingen cap</span>
+          </div>
+
+          <div class="tc-toggle-row" style="margin-top:8px">
+            <span class="tc-tlabel">Enhetsbegrensning</span>
+            <label class="tc-toggle">
+              <input type="checkbox" id="tc-utvalg-toggle"
+                onchange="testState.policy.enhetUtvalg=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <div id="tc-utvalg-fields" style="display:none">
+            <label class="tc-label">Godkjente enheter</label>
+            <textarea class="tc-input" rows="2" style="resize:vertical;font-size:11px"
+              oninput="testState.policy.enhetUtvalgListe=this.value;renderTestGraph()"
+              >iPhone 16, Samsung S25, Pixel 9</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="tc-group-gap"></div>
+
+      <!-- ── Gruppe 3: Enhet ── -->
+      <div class="tc-group">
+        <div class="tc-section">
+          <div class="tc-stitle">📱 Enhet</div>
+          <div class="tc-toggle-row">
+            <span class="tc-tlabel">Aktiv</span>
+            <label class="tc-toggle">
+              <input type="checkbox" onchange="testState.enhet.aktiv=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <label class="tc-label">Pris</label>
+          <div class="tc-numrow">
+            <input class="tc-input" type="number" value="14990" min="0" step="500"
+              oninput="testState.enhet.pris=+this.value;renderTestGraph()">
+            <span class="tc-unit">kr</span>
+          </div>
+          <div class="tc-radios">
+            <label class="tc-radio"><input type="radio" name="kjopsmodell" value="kjøp" checked
+              onchange="testState.enhet['kjøpsmodell']=this.value;renderTestGraph()"> Kjøp</label>
+            <label class="tc-radio"><input type="radio" name="kjopsmodell" value="leasing"
+              onchange="testState.enhet['kjøpsmodell']=this.value;renderTestGraph()"> Leasing</label>
+          </div>
+          <div id="tc-leasing-fields" style="display:none">
+            <label class="tc-label">Løpetid</label>
+            <div class="tc-radios">
+              <label class="tc-radio"><input type="radio" name="leasingmnd" value="12"
+                onchange="testState.enhet.leasingMåneder=+this.value;renderTestGraph()"> 12 mnd</label>
+              <label class="tc-radio"><input type="radio" name="leasingmnd" value="24" checked
+                onchange="testState.enhet.leasingMåneder=+this.value;renderTestGraph()"> 24 mnd</label>
+              <label class="tc-radio"><input type="radio" name="leasingmnd" value="36"
+                onchange="testState.enhet.leasingMåneder=+this.value;renderTestGraph()"> 36 mnd</label>
+            </div>
+            <div class="tc-derived" id="tc-mnd-sum"></div>
+          </div>
+          <div class="tc-derived" id="tc-mellomlegg-info"></div>
+        </div>
+      </div>
+
+      <div class="tc-group-gap"></div>
+
+      <!-- ── Gruppe 4: Abonnement ── -->
+      <div class="tc-group">
+        <div class="tc-section">
+          <div class="tc-stitle">📡 Abonnement</div>
+          <div class="tc-toggle-row">
+            <span class="tc-tlabel">Aktiv</span>
+            <label class="tc-toggle">
+              <input type="checkbox" onchange="testState.abonnement.aktiv=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <label class="tc-label">Plan</label>
+          <input class="tc-input" type="text" value="Business L"
+            oninput="testState.abonnement.plan=this.value;renderTestGraph()">
+          <label class="tc-label">Månedlig pris</label>
+          <div class="tc-numrow">
+            <input class="tc-input" type="number" value="449" min="0" step="50"
+              oninput="testState.abonnement.pris=+this.value;renderTestGraph()">
+            <span class="tc-unit">kr/mnd</span>
+          </div>
+          <div class="tc-derived" id="tc-mellomlegg-abo-info"></div>
+          <div class="tc-radios" style="margin-top:8px">
+            <label class="tc-radio"><input type="radio" name="simtype" value="eSIM" checked
+              onchange="testState.abonnement.simType=this.value;renderTestGraph()"> eSIM</label>
+            <label class="tc-radio"><input type="radio" name="simtype" value="Fysisk SIM"
+              onchange="testState.abonnement.simType=this.value;renderTestGraph()"> Fysisk SIM</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="tc-group-gap"></div>
+
+      <!-- ── Gruppe 5: Fakturasted + Betaling ── -->
+      <div class="tc-group">
+        <div class="tc-section" id="tc-betaling-section" style="transition:opacity 0.2s">
+          <div class="tc-stitle">💰 Mellomlegg – betaling</div>
+          <div class="tc-radios">
+            <label class="tc-radio"><input type="radio" name="betfrekvens" value="månedlig" checked
+              onchange="testState.betaling.frekvens=this.value;renderTestGraph()"> Lønnstrekk</label>
+            <label class="tc-radio"><input type="radio" name="betfrekvens" value="engangs"
+              onchange="testState.betaling.frekvens=this.value;renderTestGraph()"> Engangs</label>
+          </div>
+          <div id="tc-kjop-maaneder-fields" style="display:none;margin-top:6px">
+            <label class="tc-label">Nedbetalingsperiode</label>
+            <div class="tc-radios">
+              <label class="tc-radio"><input type="radio" name="kjopmaaneder" value="1" checked
+                onchange="testState.betaling.kjøpMåneder=+this.value;renderTestGraph()"> 1 mnd</label>
+              <label class="tc-radio"><input type="radio" name="kjopmaaneder" value="3"
+                onchange="testState.betaling.kjøpMåneder=+this.value;renderTestGraph()"> 3 mnd</label>
+              <label class="tc-radio"><input type="radio" name="kjopmaaneder" value="6"
+                onchange="testState.betaling.kjøpMåneder=+this.value;renderTestGraph()"> 6 mnd</label>
+            </div>
+            <div class="tc-derived" id="tc-kjop-mnd-sum"></div>
+          </div>
+        </div>
+
+        <div class="tc-section">
+          <div class="tc-stitle">🧾 Fakturasted</div>
+          <label class="tc-label">Utstyr</label>
+          <div class="tc-radios">
+            <label class="tc-radio"><input type="radio" name="fakturasted-enhet" value="kostnadssenter" checked
+              onchange="testState.fakturasted.enhet=this.value;renderTestGraph()"> Kostnadssenter</label>
+            <label class="tc-radio"><input type="radio" name="fakturasted-enhet" value="sentral"
+              onchange="testState.fakturasted.enhet=this.value;renderTestGraph()"> Sentral</label>
+          </div>
+          <div class="tc-toggle-row" style="margin-top:10px">
+            <span class="tc-tlabel">Eget fakturasted for abo</span>
+            <label class="tc-toggle">
+              <input type="checkbox" id="tc-split-faktura"
+                onchange="testState.fakturasted.splitAbo=this.checked;renderTestGraph()">
+              <span class="tc-track"></span>
+            </label>
+          </div>
+          <div id="tc-faktura-abo-fields" style="display:none">
+            <label class="tc-label">Abonnement</label>
+            <div class="tc-radios">
+              <label class="tc-radio"><input type="radio" name="fakturasted-abo" value="kostnadssenter" checked
+                onchange="testState.fakturasted.abo=this.value;renderTestGraph()"> Kostnadssenter</label>
+              <label class="tc-radio"><input type="radio" name="fakturasted-abo" value="sentral"
+                onchange="testState.fakturasted.abo=this.value;renderTestGraph()"> Sentral</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end test-config-panel -->
+  </div><!-- end testbruker-panel -->
+
+  <div class="log-panel" id="log-panel">
+    <div class="log-header">
+      <div class="log-header-info">
+        <h2>Din flyt</h2>
+        <p id="log-sub-text">Aspekter som gjelder for denne brukeren</p>
+      </div>
+      <div class="log-view-tabs">
+        <button class="log-view-tab active" id="log-tab-list" onclick="setLogView('list')">📋 Liste</button>
+        <button class="log-view-tab"        id="log-tab-node" onclick="setLogView('node')">◉ Node</button>
+      </div>
+    </div>
+    <div class="log-body" id="log-body"></div>
+    <div class="node-view" id="node-view" style="display:none"></div>
+    <div class="log-footer" id="log-footer">
+      <span>Totalt steg</span>
+      <span class="footer-count" id="step-count">0</span>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
